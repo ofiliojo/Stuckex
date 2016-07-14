@@ -39,6 +39,8 @@ def searchForTicker():
     global theSymbol
     global ticker
     global portfolioOfCompanies
+    ticker = {}
+    quantityOwned = 0
     session[theSymbol] = request.form["symbol"]
     url = "http://data.benzinga.com/rest/richquoteDelayed?symbols="+session[theSymbol]
     req = urllib.request.Request(url)
