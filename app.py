@@ -13,7 +13,7 @@ app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
 ticker = {}
 portfolioOfCompanies = []
 quantityOwned = 0
-cashBalance = 100000.00
+cashBalance = 100000.0
 theSymbol = ""
 numberOfStocksToBuy = ""
 numberOfStocksToSell = ""
@@ -21,6 +21,15 @@ numberOfStocksToSell = ""
 
 @app.route("/")
 def index():
+    global quantityOwned
+    global cashBalance
+    global theSymbol
+    global ticker
+    global portfolioOfCompanies
+    portfolioOfCompanies = []
+    ticker = {}
+    quantityOwned = 0
+    cashBalance = 100000.0
     return render_template('index.html' , cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies, session = session)
 
 @app.route("/search" , methods=['POST'])
