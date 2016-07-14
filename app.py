@@ -7,13 +7,13 @@
 import urllib.request
 import json
 from flask import Flask, session, render_template, url_for, request, redirect
+from flask_session import Session
 
 app = Flask(__name__)
-
+#app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
 SESSION_TYPE = 'redis'
 app.config.from_object(__name__)
-session.Session(app)
-
+Session(app)
 ticker = {}
 portfolioOfCompanies = []
 quantityOwned = 0
@@ -25,7 +25,7 @@ numberOfStocksToSell = ""
 
 @app.route("/")
 def index():
-    return render_template('index.html' , cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies, session = session)
+    return render_template('index.html' , cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
 
 @app.route("/search" , methods=['POST'])
 def searchForTicker():
@@ -34,17 +34,17 @@ def searchForTicker():
     global theSymbol
     global ticker
     global portfolioOfCompanies
-    session[theSymbol] = request.form["symbol"]
-    url = "http://data.benzinga.com/rest/richquoteDelayed?symbols="+session[theSymbol]
+    theSymbol = request.form["symbol"]
+    url = "http://data.benzinga.com/rest/richquoteDelayed?symbols="+theSymbol
     req = urllib.request.Request(url)
     with urllib.request.urlopen(req) as response:
         the_page = response.read()
         data = json.loads(the_page.decode('utf-8'))
-    ticker = {'name': data.get(session[theSymbol]).get('name'),
-                'bidPrice': data.get(session[theSymbol]).get('bidPrice'),
-                    'askPrice': data.get(session[theSymbol]).get('askPrice'),
+    ticker = {'name': data.get(theSymbol).get('name'),
+                'bidPrice': data.get(theSymbol).get('bidPrice'),
+                    'askPrice': data.get(theSymbol).get('askPrice'),
                         'quantityOwned' : quantityOwned}
-    return render_template('result.html', ticker = ticker, cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies, session = session)
+    return render_template('result.html', ticker = ticker, cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
 @app.route("/buy", methods=['POST'])
 def buy():
     global ticker
@@ -52,8 +52,8 @@ def buy():
     global cashBalance
     global theSymbol
     global portfolioOfCompanies
-    session[numberOfStocksToBuy] = request.form["numberOfStocksToBuy"]
-    numberToBuy = int(session[numberOfStocksToBuy])
+    numberOfStocksToBuy = request.form["numberOfStocksToBuy"]
+    numberToBuy = int(numberOfStocksToBuy)
     costOfStocks = int(ticker.get('askPrice')) * numberToBuy
     if costOfStocks <= cashBalance:
         if not any(stock.get('name', None) == ticker.get('name') for stock in portfolioOfCompanies):
@@ -65,7 +65,7 @@ def buy():
                 if stock['name'] == ticker['name']:
                     stock['quantityOwned'] = stock['quantityOwned']+numberToBuy
             cashBalance = cashBalance - costOfStocks
-    return render_template('result.html', ticker = ticker, cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies, session = session)
+    return render_template('result.html', ticker = ticker, cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
 
 @app.route("/sell", methods=['POST'])
 def sell():
@@ -74,8 +74,8 @@ def sell():
     global ticker
     global theSymbol
     global portfolioOfCompanies
-    session[numberOfStocksToSell] = request.form["numberOfStocksToSell"]
-    numberToSell = int(session[numberOfStocksToSell])
+    numberOfStocksToSell = request.form["numberOfStocksToSell"]
+    numberToSell = int(numberOfStocksToSell)
     costOfStocks = int(ticker.get('bidPrice')) * numberToSell
     for stock in portfolioOfCompanies:
         if stock['name'] == ticker['name']:
