@@ -11,9 +11,6 @@ from flask_session import Session
 
 app = Flask(__name__)
 #app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
-SESSION_TYPE = 'redis'
-app.config.from_object(__name__)
-Session(app)
 ticker = {}
 portfolioOfCompanies = []
 quantityOwned = 0
