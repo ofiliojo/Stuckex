@@ -11,6 +11,7 @@ from flask_session import Session
 
 app = Flask(__name__)
 #app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
+Session(app)
 ticker = {}
 portfolioOfCompanies = []
 quantityOwned = 0
@@ -22,6 +23,15 @@ numberOfStocksToSell = ""
 
 @app.route("/")
 def index():
+    global quantityOwned
+    global cashBalance
+    global theSymbol
+    global ticker
+    global portfolioOfCompanies
+    ticker = {}
+    portfolioOfCompanies = []
+    quantityOwned = 0
+    cashBalance = 100000.0
     return render_template('index.html' , cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
 
 @app.route("/search" , methods=['POST'])
@@ -31,6 +41,7 @@ def searchForTicker():
     global theSymbol
     global ticker
     global portfolioOfCompanies
+    ticker = {}
     theSymbol = request.form["symbol"]
     url = "http://data.benzinga.com/rest/richquoteDelayed?symbols="+theSymbol
     req = urllib.request.Request(url)
