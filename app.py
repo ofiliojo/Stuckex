@@ -9,7 +9,11 @@ import json
 from flask import Flask, session, render_template, url_for, request, redirect
 
 app = Flask(__name__)
-app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
+
+SESSION_TYPE = 'redis'
+app.config.from_object(__name__)
+session.Session(app)
+
 ticker = {}
 portfolioOfCompanies = []
 quantityOwned = 0
@@ -85,14 +89,5 @@ def sell():
 
 
 if __name__ == "__main__":
-    global quantityOwned
-    global cashBalance
-    global theSymbol
-    global ticker
-    global portfolioOfCompanies
-    portfolioOfCompanies = []
-    ticker = {}
-    quantityOwned = 0
-    cashBalance = 100000.0
     app.debug = True
     app.run()
