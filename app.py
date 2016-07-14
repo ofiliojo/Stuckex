@@ -21,15 +21,6 @@ numberOfStocksToSell = ""
 
 @app.route("/")
 def index():
-    global quantityOwned
-    global cashBalance
-    global theSymbol
-    global ticker
-    global portfolioOfCompanies
-    portfolioOfCompanies = []
-    ticker = {}
-    quantityOwned = 0
-    cashBalance = 100000.0
     return render_template('index.html' , cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies, session = session)
 
 @app.route("/search" , methods=['POST'])
@@ -39,8 +30,6 @@ def searchForTicker():
     global theSymbol
     global ticker
     global portfolioOfCompanies
-    ticker = {}
-    quantityOwned = 0
     session[theSymbol] = request.form["symbol"]
     url = "http://data.benzinga.com/rest/richquoteDelayed?symbols="+session[theSymbol]
     req = urllib.request.Request(url)
@@ -96,5 +85,14 @@ def sell():
 
 
 if __name__ == "__main__":
+    global quantityOwned
+    global cashBalance
+    global theSymbol
+    global ticker
+    global portfolioOfCompanies
+    portfolioOfCompanies = []
+    ticker = {}
+    quantityOwned = 0
+    cashBalance = 100000.0
     app.debug = True
     app.run()
