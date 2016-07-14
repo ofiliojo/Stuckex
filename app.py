@@ -7,11 +7,10 @@
 import urllib.request
 import json
 from flask import Flask, session, render_template, url_for, request, redirect
-from flask_session import Session
+
 
 app = Flask(__name__)
-#app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
-Session(app)
+app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
 ticker = {}
 portfolioOfCompanies = []
 quantityOwned = 0
@@ -19,28 +18,25 @@ cashBalance = 100000.0
 theSymbol = ""
 numberOfStocksToBuy = ""
 numberOfStocksToSell = ""
+sessionCounter = 0
+arrayOfCompanies = []
+arrayOfCashBalances = []
 
 
 @app.route("/")
 def index():
-    global quantityOwned
-    global cashBalance
-    global theSymbol
-    global ticker
-    global portfolioOfCompanies
     ticker = {}
     portfolioOfCompanies = []
-    quantityOwned = 0
     cashBalance = 100000.0
-    return render_template('index.html' , cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
+    arrayOfCompanies.append(portfolioOfCompanies)
+    arrayOfCashBalances.append(cashBalance)
+    return render_template('index.html' , sessionCounter = sessionCounter, arrayOfCompanies = arrayOfCompanies, arrayOfCashBalances = arrayOfCashBalances)
 
 @app.route("/search" , methods=['POST'])
 def searchForTicker():
     global quantityOwned
-    global cashBalance
     global theSymbol
     global ticker
-    global portfolioOfCompanies
     ticker = {}
     theSymbol = request.form["symbol"]
     url = "http://data.benzinga.com/rest/richquoteDelayed?symbols="+theSymbol
@@ -52,7 +48,7 @@ def searchForTicker():
                 'bidPrice': data.get(theSymbol).get('bidPrice'),
                     'askPrice': data.get(theSymbol).get('askPrice'),
                         'quantityOwned' : quantityOwned}
-    return render_template('result.html', ticker = ticker, cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
+    return render_template('result.html', ticker = ticker, sessionCounter = sessionCounter, arrayOfCompanies = arrayOfCompanies, arrayOfCashBalances = arrayOfCashBalances)
 @app.route("/buy", methods=['POST'])
 def buy():
     global ticker
@@ -60,6 +56,10 @@ def buy():
     global cashBalance
     global theSymbol
     global portfolioOfCompanies
+    global sessionCounter
+    global arrayOfCompanies
+    global arrayOfCashBalances
+    sessionCounter = sessionCounter + 1
     numberOfStocksToBuy = request.form["numberOfStocksToBuy"]
     numberToBuy = int(numberOfStocksToBuy)
     costOfStocks = int(ticker.get('askPrice')) * numberToBuy
@@ -73,7 +73,9 @@ def buy():
                 if stock['name'] == ticker['name']:
                     stock['quantityOwned'] = stock['quantityOwned']+numberToBuy
             cashBalance = cashBalance - costOfStocks
-    return render_template('result.html', ticker = ticker, cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
+    arrayOfCompanies.append(portfolioOfCompanies)
+    arrayOfCashBalances.append(cashBalance)
+    return render_template('result.html', ticker = ticker, sessionCounter = sessionCounter, arrayOfCompanies = arrayOfCompanies, arrayOfCashBalances = arrayOfCashBalances)
 
 @app.route("/sell", methods=['POST'])
 def sell():
@@ -82,6 +84,10 @@ def sell():
     global ticker
     global theSymbol
     global portfolioOfCompanies
+    global sessionCounter
+    global arrayOfCompanies
+    global arrayOfCashBalances
+    sessionCounter = sessionCounter + 1
     numberOfStocksToSell = request.form["numberOfStocksToSell"]
     numberToSell = int(numberOfStocksToSell)
     costOfStocks = int(ticker.get('bidPrice')) * numberToSell
@@ -92,7 +98,9 @@ def sell():
                 cashBalance = cashBalance + costOfStocks
                 if stock['quantityOwned'] == 0:
                     portfolioOfCompanies[:] = [stock for stock in portfolioOfCompanies if stock.get('name') != ticker.get('name')]
-    return render_template('result.html', ticker = ticker, cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies, session = session)
+    arrayOfCompanies.append(portfolioOfCompanies)
+    arrayOfCashBalances.append(cashBalance)
+    return render_template('result.html', ticker = ticker, sessionCounter = sessionCounter, arrayOfCompanies = arrayOfCompanies, arrayOfCashBalances = arrayOfCashBalances)
 
 
 

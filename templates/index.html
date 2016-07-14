@@ -15,13 +15,13 @@
       </form>
       {% block body %} {% endblock %}
       <div id="portfolio">
-        <h3>Cash: ${{cashBalance}}</h3>
+        <h3>Cash: ${{arrayOfCashBalances[sessionCounter]}}</h3>
         <table>
           <tr>
             <th>Company</th>
             <th>Number of Stocks</th>
           </tr>
-          {% for ticker in portfolioOfCompanies %}
+          {% for ticker in arrayOfCompanies[sessionCounter] %}
           <tr>
             <td>{{ticker.get('name')}}</td>
             <td>{{ticker.get('quantityOwned')}}</td>
