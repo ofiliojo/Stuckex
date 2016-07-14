@@ -17,8 +17,6 @@ theSymbol = ""
 
 @app.route("/")
 def index():
-    portfolioOfCompanies = []
-    cashBalance = 100000.00
     return flask.render_template('index.html' , cashBalance = cashBalance, portfolioOfCompanies = portfolioOfCompanies)
 
 @app.route("/search" , methods=['POST'])
