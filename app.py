@@ -13,7 +13,6 @@ from flask import Flask, session, render_template, url_for, request, redirect
 app = Flask(__name__)
 app.secret_key = 'jdhfsk.jdfnskdnjk.snclkamdnvjdn;lmj'
 ticker = {}
-portfolioOfCompanies = []
 quantityOwned = 0
 theSymbol = ""
 numberOfStocksToBuy = ""
@@ -23,7 +22,8 @@ numberOfStocksToSell = ""
 @app.route("/")
 def index():
     session['cashBalance'] = 1000000.00
-    return render_template('index.html', cash = session['cashBalance'], portfolioOfCompanies = portfolioOfCompanies)
+    session['portfolioOfCompanies'] = []
+    return render_template('index.html', cash = session['cashBalance'], portfolio = session['portfolioOfCompanies'])
 
 @app.route("/search" , methods=['POST'])
 def searchForTicker():
@@ -41,45 +41,43 @@ def searchForTicker():
                 'bidPrice': data.get(theSymbol).get('bidPrice'),
                     'askPrice': data.get(theSymbol).get('askPrice'),
                         'quantityOwned' : quantityOwned}
-    return render_template('result.html', ticker = ticker, cash = session['cashBalance'], portfolioOfCompanies = portfolioOfCompanies)
+    return render_template('result.html', ticker = ticker, cash = session['cashBalance'], portfolio = session['portfolioOfCompanies'])
 @app.route("/buy", methods=['POST'])
 def buy():
     global ticker
     global quantityOwned
     global theSymbol
-    global portfolioOfCompanies
     numberOfStocksToBuy = request.form["numberOfStocksToBuy"]
     numberToBuy = int(numberOfStocksToBuy)
     costOfStocks = int(ticker.get('askPrice')) * numberToBuy
     if costOfStocks <= session['cashBalance']:
-        if not any(stock.get('name', None) == ticker.get('name') for stock in portfolioOfCompanies):
+        if not any(stock.get('name', None) == ticker.get('name') for stock in session['portfolioOfCompanies']):
             ticker['quantityOwned'] = numberToBuy
             session['cashBalance'] = session['cashBalance'] - costOfStocks
-            portfolioOfCompanies.append(ticker)
+            session['portfolioOfCompanies'].append(ticker)
         else:
-            for stock in portfolioOfCompanies:
+            for stock in session['portfolioOfCompanies']:
                 if stock['name'] == ticker['name']:
                     stock['quantityOwned'] = stock['quantityOwned']+numberToBuy
                 session['cashBalance'] = session['cashBalance'] - costOfStocks
-    return render_template('result.html', ticker = ticker, cash = session['cashBalance'], portfolioOfCompanies = portfolioOfCompanies)
+    return render_template('result.html', ticker = ticker, cash = session['cashBalance'], portfolio = session['portfolioOfCompanies'])
 
 @app.route("/sell", methods=['POST'])
 def sell():
     global quantityOwned
     global ticker
     global theSymbol
-    global portfolioOfCompanies
     numberOfStocksToSell = request.form["numberOfStocksToSell"]
     numberToSell = int(numberOfStocksToSell)
     costOfStocks = int(ticker.get('bidPrice')) * numberToSell
-    for stock in portfolioOfCompanies:
+    for stock in session['portfolioOfCompanies']:
         if stock['name'] == ticker['name']:
             if numberToSell <= stock['quantityOwned']:
                 stock['quantityOwned'] = stock['quantityOwned']-numberToSell
                 session['cashBalance'] = session['cashBalance'] + costOfStocks
                 if stock['quantityOwned'] == 0:
-                    portfolioOfCompanies[:] = [stock for stock in portfolioOfCompanies if stock.get('name') != ticker.get('name')]
-    return render_template('result.html', ticker = ticker, cash = session['cashBalance'], portfolioOfCompanies = portfolioOfCompanies)
+                    session['portfolioOfCompanies'][:] = [stock for stock in portfolioOfCompanies if stock.get('name') != ticker.get('name')]
+    return render_template('result.html', ticker = ticker, cash = session['cashBalance'], portfolio = session['portfolioOfCompanies'])
 
 
 
