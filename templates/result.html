@@ -1,16 +1,16 @@
 {% extends "index.html" %}
 {% block body %}
-  <div id ="companySearch">
+  <div id="companySearch">
     <h3>Company Name: {{ticker.get('name') }}</h3>
     <h3>Ask Price: {{ticker.get('askPrice')}}</h3>
     <h3>Bid Price: {{ticker.get('bidPrice')}}</h3>
     <form id="buyInput" action = "{{url_for('buy')}}" method="POST">
       <input id="buyBox" type="text" name="numberOfStocksToBuy" placeholder="Number to Buy"/>
-      <input id="buyButton" type="submit" value="Buy"/>
+      <input id="buyButton" type="submit" value="Buy"/>  {{buyError}}
     </form>
     <form id="sellInput" action = "{{url_for('sell')}}" method="POST">
       <input id="sellBox" type="text" name="numberOfStocksToSell" placeholder="Number to Sell"/>
-      <input id="sellButton" type="submit" value="Sell"/>
+      <input id="sellButton" type="submit" value="Sell"/>  {{sellError}}
     </form>
   </div>
 {% endblock %}

@@ -11,8 +11,9 @@
       </header>
       <form id="searchInput" action = "{{url_for('searchForTicker')}}" method="POST">
         <input id="searchBox" type="text" name="symbol" placeholder="Search Symbol"/>
-        <input id="searchButton" type="submit" value="Search"/>
+        <input id="searchButton" type="submit" value="Search"/>  {{searchError}}
       </form>
+
       {% block body %} {% endblock %}
       <div id="portfolio">
         <h3>Cash: ${{cash}}</h3>
