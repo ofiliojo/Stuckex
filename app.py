@@ -63,7 +63,7 @@ def sell():
                 stock['quantityOwned'] = stock['quantityOwned']-numberToSell
                 session['cashBalance'] = session['cashBalance'] + costOfStocks
                 if stock['quantityOwned'] == 0:
-                    session['portfolioOfCompanies'][:] = [stock for stock in portfolioOfCompanies if stock.get('name') != session['ticker'].get('name')]
+                    session['portfolioOfCompanies'][:] = [stock for stock in session['portfolioOfCompanies'] if stock.get('name') != session['ticker'].get('name')]
     return render_template('result.html', ticker = session['ticker'], cash = session['cashBalance'], portfolio = session['portfolioOfCompanies'])
 
 
